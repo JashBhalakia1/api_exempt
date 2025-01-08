@@ -5,37 +5,38 @@ require "includes/dbConnection.php";
 require "lang/en.php";
 
 // Class Auto Load
-function classAutoLoad($classname){
-
+function classAutoLoad($classname) {
     $directories = ["contents", "layouts", "menus", "forms", "processes", "global"];
 
-    foreach($directories AS $dir){
-        $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $classname . ".php";
-        if(file_exists($filename) AND is_readable($filename)){
+    foreach ($directories as $dir) {
+        $filename = __DIR__ . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $classname . ".php";
+        if (file_exists($filename) && is_readable($filename)) {
             require_once $filename;
         }
     }
 }
 
-    spl_autoload_register('classAutoLoad');
-
-    //$ObjGlob = new fncs();
-    //$ObjSendMail = new SendMail();
+spl_autoload_register('classAutoLoad');
 
 // Create instances of all classes
-    $ObjLayouts = new layouts();
-    $ObjMenus = new menus();
-    $ObjHeadings = new headings();
-    $ObjCont = new contents();
-    $ObjForm = new user_forms();
-    $conn = new dbConnection(DBTYPE, HOSTNAME, DBPORT, HOSTUSER, HOSTPASS, DBNAME);
+$ObjLayouts = new layouts();
+$ObjMenus = new menus();
+$ObjHeadings = new headings();
+$ObjCont = new contents();
+$ObjForm = new user_forms();
+$conn = new dbConnection(DBTYPE, HOSTNAME, DBPORT, HOSTUSER, HOSTPASS, DBNAME);
 
 // Create process instances
+$ObjAuth = new auth();
 
-    $ObjAuth = new auth();
-    $ObjAuth->signup($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
-    $ObjAuth->verify_code($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
-    $ObjAuth->set_passphrase($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
-    $ObjAuth->signin($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
-    $ObjAuth->signout($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
-    $ObjAuth->save_details($conn, $ObjGlob, $ObjSendMail, $lang, $conf);
+// Use only available variables in method calls
+try {
+    $ObjAuth->signup($conn, null, null, $lang, null);
+    $ObjAuth->verify_code($conn, null, null, $lang, null);
+    $ObjAuth->set_passphrase($conn, null, null, $lang, null);
+    $ObjAuth->signin($conn, null, null, $lang, null);
+    $ObjAuth->signout($conn, null, null, $lang, null);
+    $ObjAuth->save_details($conn, null, null, $lang, null);
+} catch (Exception $e) {
+    error_log("Error in authentication process: " . $e->getMessage());
+}
